@@ -20,6 +20,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.application1.security.CustomTrustManager;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -27,19 +29,17 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.KeyStore;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -85,23 +85,36 @@ public class MainActivity extends AppCompatActivity {
 
     private SSLSocketFactory getSSLSocketFactory() {
         try {
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            InputStream caInput = getResources().openRawResource(R.raw.mysite); // server.crt
-            Certificate ca = cf.generateCertificate(caInput);
-            caInput.close();
-
-            // Tạo KeyStore chứa chứng chỉ tin cậy
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             keyStore.load(null, null);
-            keyStore.setCertificateEntry("ca", ca);
 
-            // Tạo TrustManager từ KeyStore
             TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             tmf.init(keyStore);
 
-            // Khởi tạo SSLContext với TrustManager trên
+            // Tạo TrustManager từ KeyStore
+            X509TrustManager defaultTm = null;
+            for (TrustManager tm : tmf.getTrustManagers()) {
+                if (tm instanceof X509TrustManager) {
+                    defaultTm = (X509TrustManager) tm;
+                    break;
+                }
+            }
+            if (defaultTm == null) {
+                throw new IllegalStateException("Không tìm thấy X509TrustManager mặc định");
+            }
+
+            // Đọc dữ liệu trong file pubkey_hash.txt chứa public key đã được băm (bằng sha256) và lưu trữ dưới dạng Base64
+            InputStream hashedKeyInput = getResources().openRawResource(R.raw.pubkey_hash);
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(hashedKeyInput));
+            String pinnedPublicKeyHash = reader.readLine().trim();
+            reader.close();
+
+            // Tạo CustomTrustManager
+            CustomTrustManager pinningTm = new CustomTrustManager(defaultTm, pinnedPublicKeyHash);
+
             SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, tmf.getTrustManagers(), null);
+            sslContext.init(null, new TrustManager[]{pinningTm}, null);
 
             return sslContext.getSocketFactory();
 
@@ -151,16 +164,13 @@ public class MainActivity extends AppCompatActivity {
             }
 
             String responseBody = response.toString();
-//            Log.d("DEBUG", "Response Body: " + responseBody);
 
             if (responseCode >= 200 && responseCode < 300) {
                 JSONObject resp = new JSONObject(responseBody);
                 String loginStatus = resp.getString("loginStatus");
-                Log.d("DEBUG", "Response Body: " + parseBoolean(loginStatus));
 
                 if (parseBoolean(loginStatus)) {
                     resultText = resp.getString("userInfo");
-                    Log.d("DEBUG", "Response Body: " + resultText);
                     return true;
                 } else {
                     errorText = resp.getString("message");
