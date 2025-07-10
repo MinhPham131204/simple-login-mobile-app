@@ -74,6 +74,10 @@ public class MainActivity extends AppCompatActivity {
                 handler.post(() -> {
                     if (success) {
                         Intent intent = new Intent(this, HomeActivity.class);
+
+                        // ensure only 1 activity in the back stack
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+
                         startActivity(intent);
                     } else {
                         Toast.makeText(MainActivity.this, errorText != null ? errorText : "Login failed", Toast.LENGTH_SHORT).show();

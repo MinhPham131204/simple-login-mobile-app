@@ -28,8 +28,6 @@ public class CustomTrustManager implements X509TrustManager {
         // Lấy public key từ chứng chỉ đầu tiên (gốc server)
         X509Certificate cert = chain[0];
 
-        // Log.d("DEBUG", cert.toString());
-
         byte[] pubKeyEncoded = cert.getPublicKey().getEncoded();
 
         try {
