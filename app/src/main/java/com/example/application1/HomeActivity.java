@@ -3,6 +3,7 @@ package com.example.application1;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,6 +24,11 @@ public class HomeActivity extends AppCompatActivity {
             return insets;
         });
         Button logoutButton = findViewById(R.id.button);
+
+        TextView textView = findViewById(R.id.textView);
+        String username = getIntent().getStringExtra("username");
+        textView.setText("Welcome, " + username);
+
         logoutButton.setOnClickListener(v -> {
             Intent intent = new Intent(this, MainActivity.class);
 

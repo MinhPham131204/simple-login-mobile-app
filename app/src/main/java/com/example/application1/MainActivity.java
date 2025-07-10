@@ -78,6 +78,8 @@ public class MainActivity extends AppCompatActivity {
                         // ensure only 1 activity in the back stack
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
 
+                        intent.putExtra("username", resultText);
+
                         startActivity(intent);
                     } else {
                         Toast.makeText(MainActivity.this, errorText != null ? errorText : "Login failed", Toast.LENGTH_SHORT).show();
