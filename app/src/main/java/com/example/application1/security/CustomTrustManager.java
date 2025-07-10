@@ -1,6 +1,7 @@
 package com.example.application1.security;
 
 import android.util.Base64;
+import android.util.Log;
 
 import javax.net.ssl.*;
 import java.security.MessageDigest;
@@ -27,8 +28,6 @@ public class CustomTrustManager implements X509TrustManager {
 
         // Lấy public key từ chứng chỉ đầu tiên (gốc server)
         X509Certificate cert = chain[0];
-
-        // Log.d("DEBUG", cert.toString());
 
         byte[] pubKeyEncoded = cert.getPublicKey().getEncoded();
 

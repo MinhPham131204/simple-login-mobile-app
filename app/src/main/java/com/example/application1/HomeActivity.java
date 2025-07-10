@@ -25,6 +25,10 @@ public class HomeActivity extends AppCompatActivity {
         Button logoutButton = findViewById(R.id.button);
         logoutButton.setOnClickListener(v -> {
             Intent intent = new Intent(this, MainActivity.class);
+
+            // ensure only 1 activity in back stack
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+
             startActivity(intent);
             overridePendingTransition(R.anim.enter, R.anim.exit);
         });

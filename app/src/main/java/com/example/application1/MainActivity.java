@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("DEBUG", "onCreate");
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -74,6 +76,10 @@ public class MainActivity extends AppCompatActivity {
                 handler.post(() -> {
                     if (success) {
                         Intent intent = new Intent(this, HomeActivity.class);
+
+                        // ensure only 1 activity in back stack
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+
                         startActivity(intent);
                     } else {
                         Toast.makeText(MainActivity.this, errorText != null ? errorText : "Login failed", Toast.LENGTH_SHORT).show();
@@ -148,7 +154,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
             int responseCode = conn.getResponseCode();
-            Log.d("DEBUG", "Response Code: " + responseCode);
 
             // Đọc phản hồi
             InputStream inputStream = (responseCode >= 200 && responseCode < 300)
@@ -193,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
 
         } catch (Exception e) {
             e.printStackTrace();
-            errorText = "Server error: " + e.getMessage();
+            errorText = "Error: " + e.getMessage();
             return false;
         } finally {
             if (conn != null) {
@@ -201,4 +206,40 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+//    @Override
+//    protected void onStart(){
+//        super.onStart();
+//        Log.d("DEBUG", "onStart");
+//    }
+//
+//    @Override
+//    protected void onResume(){
+//        super.onResume();
+//        Log.d("DEBUG", "onResume");
+//    }
+//
+//    @Override
+//    protected void onPause(){
+//        super.onPause();
+//        Log.d("DEBUG", "onPause");
+//    }
+//
+//    @Override
+//    protected void onStop(){
+//        super.onStop();
+//        Log.d("DEBUG", "onStop");
+//    }
+//
+//    @Override
+//    protected void onDestroy(){
+//        super.onDestroy();
+//        Log.d("DEBUG", "onDestroy");
+//    }
+//
+//    @Override
+//    protected void onRestart(){
+//        super.onRestart();
+//        Log.d("DEBUG", "onRestart");
+//    }
 }
