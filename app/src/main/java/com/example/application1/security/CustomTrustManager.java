@@ -40,6 +40,7 @@ public class CustomTrustManager implements X509TrustManager {
                 throw new CertificateException("Public key pinning failure!");
             }
 
+            Log.d("DEBUG", "Verify successfully");
         } catch (Exception e) {
             throw new CertificateException("Failed to verify public key pinning", e);
         }

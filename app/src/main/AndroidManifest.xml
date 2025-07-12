@@ -12,10 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Application1">
         <activity
-            android:name=".HomeActivity"
+            android:name=".view.home.HomeActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".view.login.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
