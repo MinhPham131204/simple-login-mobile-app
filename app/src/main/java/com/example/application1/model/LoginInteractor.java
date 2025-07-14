@@ -18,6 +18,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
 import java.security.KeyStore;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -27,7 +29,11 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
 public class LoginInteractor {
-    private String errorText;
+    private final ExecutorService executor;
+
+    public LoginInteractor() {
+        executor = Executors.newSingleThreadExecutor();
+    }
 
     private SSLSocketFactory getSSLSocketFactory() {
         try {
@@ -74,78 +80,81 @@ public class LoginInteractor {
     }
 
     public void sendLoginRequest(String email, String password, LoginPresenter presenter) {
-        HttpsURLConnection conn = null;
-        try {
-            URL url = new URL("https://192.168.1.18/login");
-            conn = (HttpsURLConnection) url.openConnection();
+        Handler handler = new Handler(Looper.getMainLooper());
 
-            conn.setSSLSocketFactory(getSSLSocketFactory());
+        executor.execute(() -> {
+            HttpsURLConnection conn = null;
+            try {
+                URL url = new URL("https://192.168.1.18/login");
+                conn = (HttpsURLConnection) url.openConnection();
 
-            // Thiết lập phương thức và headers
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-            conn.setDoOutput(true);
+                conn.setSSLSocketFactory(getSSLSocketFactory());
 
-            // Tạo JSON body
-            JSONObject json = new JSONObject();
-            json.put("email", email);
-            json.put("password", password);
-            byte[] postData = json.toString().getBytes();
+                // Thiết lập phương thức và headers
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                conn.setDoOutput(true);
 
-            // Gửi dữ liệu
-            try (OutputStream os = conn.getOutputStream()) {
-                os.write(postData);
-                os.flush();
-            }
+                // Tạo JSON body
+                JSONObject json = new JSONObject();
+                json.put("email", email);
+                json.put("password", password);
+                byte[] postData = json.toString().getBytes();
 
-            int responseCode = conn.getResponseCode();
+                // Gửi dữ liệu
+                try (OutputStream os = conn.getOutputStream()) {
+                    os.write(postData);
+                    os.flush();
+                }
 
-            // Đọc phản hồi
-            InputStream inputStream = (responseCode >= 200 && responseCode < 300)
-                    ? conn.getInputStream()
-                    : conn.getErrorStream();
+                int responseCode = conn.getResponseCode();
 
-            StringBuilder response = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    response.append(line);
+                // Đọc phản hồi
+                InputStream inputStream = (responseCode >= 200 && responseCode < 300)
+                        ? conn.getInputStream()
+                        : conn.getErrorStream();
+
+                StringBuilder response = new StringBuilder();
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+                }
+
+                String responseBody = response.toString();
+
+                Log.d("DEBUG", "response code: " + responseCode);
+
+                if (responseCode >= 200 && responseCode < 300) {
+                    JSONObject resp = new JSONObject(responseBody);
+                    String loginStatus = resp.getString("loginStatus");
+
+                    handler.post(() -> {
+                        if (parseBoolean(loginStatus)) {
+                            try {
+                                presenter.onLoginSuccess(resp.getString("userInfo"));
+                            } catch (JSONException e) {
+                                throw new RuntimeException(e);
+                            }
+                        } else {
+                            try {
+                                presenter.onLoginFailed(resp.getString("message"));
+                            } catch (JSONException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    });
+                }
+
+            } catch (Exception e) {
+                handler.post(() -> presenter.onLoginError(e.getMessage()));
+            } finally {
+                if (conn != null) {
+                    conn.disconnect();
+                    executor.shutdown();
                 }
             }
-
-            String responseBody = response.toString();
-
-            Log.d("DEBUG", "response code: " + responseCode);
-
-            Handler handler = new Handler(Looper.getMainLooper());
-
-            if (responseCode >= 200 && responseCode < 300) {
-                JSONObject resp = new JSONObject(responseBody);
-                String loginStatus = resp.getString("loginStatus");
-
-                handler.post(() -> {
-                    if (parseBoolean(loginStatus)) {
-                        try {
-                            presenter.onLoginSuccess(resp.getString("userInfo"));
-                        } catch (JSONException e) {
-                            throw new RuntimeException(e);
-                        }
-                    } else {
-                        try {
-                            presenter.onLoginFailed(resp.getString("message"));
-                        } catch (JSONException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                });
-            }
-
-        } catch (Exception e) {
-            presenter.onLoginError(e.getMessage());
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
-        }
+        });
     }
 }
