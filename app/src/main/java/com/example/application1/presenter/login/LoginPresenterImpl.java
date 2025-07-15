@@ -12,9 +12,17 @@ public class LoginPresenterImpl implements LoginPresenter {
         this.loginInteractor = new LoginInteractor();
     }
 
+    public LoginPresenterImpl(LoginView loginView, LoginInteractor loginInteractor) {
+        this.loginView = loginView;
+        this.loginInteractor = loginInteractor;
+    }
+
     @Override
     public void validateUser(String email, String password) {
-        loginInteractor.sendLoginRequest(email, password, this);
+        if(!email.matches("[a-zA-Z0-9]+@[a-z]+[.]com")) {
+            loginView.setLoginFailed("Incorrect email format");
+        }
+        else loginInteractor.sendLoginRequest(email, password, this);
     }
 
     @Override
