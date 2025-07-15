@@ -1,6 +1,7 @@
 package com.example.application1.view.login;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
 import android.util.Log;
@@ -14,12 +15,17 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.application1.checkEmulatorFactory.checkEmulator.CheckEmulator;
+import com.example.application1.checkEmulatorFactory.checkEmulatorCreator.CheckCreator;
+import com.example.application1.checkEmulatorFactory.checkEmulatorCreator.DeviceCheckCreator;
+import com.example.application1.checkEmulatorFactory.checkEmulatorCreator.FingerprintCheckCreator;
+import com.example.application1.checkEmulatorFactory.checkEmulatorCreator.HardwareCheckCreator;
+import com.example.application1.checkEmulatorFactory.checkEmulatorCreator.ModelCheckCreator;
+import com.example.application1.checkEmulatorFactory.checkEmulatorCreator.ProductCheckCreator;
 import com.example.application1.view.home.HomeActivity;
 import com.example.application1.R;
 import com.example.application1.presenter.login.LoginPresenter;
 import com.example.application1.presenter.login.LoginPresenterImpl;
-
-
 
 public class MainActivity extends AppCompatActivity implements LoginView{
 
@@ -37,6 +43,10 @@ public class MainActivity extends AppCompatActivity implements LoginView{
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+//        CheckCreator cc = new DeviceCheckCreator();
+//        CheckEmulator ce = cc.createCheck();
+//        Log.d("DEBUG", "app run on emulator: " + ce.isEmulator());
 
         emailEditText = findViewById(R.id.emailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
