@@ -19,8 +19,14 @@ public class LoginPresenterImpl implements LoginPresenter {
 
     @Override
     public void validateUser(String email, String password) {
-        if(!email.matches("[a-zA-Z0-9]+@[a-z]+[.]com")) {
+        if (email.isEmpty()) {
+            loginView.setLoginFailed("Please enter your email");
+        }
+        else if(!email.matches("[a-zA-Z0-9]+@[a-z]+[.]com")) {
             loginView.setLoginFailed("Incorrect email format");
+        }
+        else if (password.isEmpty()) {
+            loginView.setLoginFailed("Please enter your password");
         }
         else loginInteractor.sendLoginRequest(email, password, this);
     }

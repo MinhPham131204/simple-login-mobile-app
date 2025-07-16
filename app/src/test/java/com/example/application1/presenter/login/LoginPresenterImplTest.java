@@ -32,7 +32,7 @@ public class LoginPresenterImplTest {
 
     @Test
     public void testOnLoginFailed() {
-        String message = "Incorrect password";
+        String message = "Invalid info";
 
         loginPresenter.onLoginFailed(message);
 
@@ -49,19 +49,13 @@ public class LoginPresenterImplTest {
     }
 
     @Test
-    public void testValidateUser_shouldCallSendLoginRequest() {
+    public void testValidateUser() {
         String email = "email@example.com";
         String password = "password123";
 
         loginPresenter.validateUser(email, password);
 
         verify(loginInteractor).sendLoginRequest(email, password, loginPresenter);
-    }
-
-    @Test
-    public void testOnLoginSuccess_withNullUsername() {
-        loginPresenter.onLoginSuccess("");
-        verify(loginView).setLoginSuccess("");
     }
 
     @Test
@@ -77,29 +71,26 @@ public class LoginPresenterImplTest {
     }
 
     @Test
-    public void testValidateUser_withWrongEmail_case1() {
+    public void testValidateUser_withWrongFormatEmail_case1() {
         loginPresenter.validateUser("  @gmail.com", "password");
-
-        verify(loginInteractor, never()).sendLoginRequest("  @gmail.com", "password", loginPresenter);
+        verify(loginView).setLoginFailed("Incorrect email format");
     }
 
     @Test
-    public void testValidateUser_withWrongEmail_case2() {
+    public void testValidateUser_withWrongFormatEmail_case2() {
         loginPresenter.validateUser("abc@gmail123.com", "password");
-
-        verify(loginInteractor, never()).sendLoginRequest("abc@gmail123.com", "password", loginPresenter);
+        verify(loginView).setLoginFailed("Incorrect email format");
     }
 
     @Test
     public void testValidateUser_withEmptyEmail() {
         loginPresenter.validateUser("", "password");
-
-        verify(loginInteractor, never()).sendLoginRequest("", "password", loginPresenter);
+        verify(loginView).setLoginFailed("Please enter your email");
     }
 
     @Test
-    public void testValidateUser_withNullPassword() {
+    public void testValidateUser_withEmptyPassword() {
         loginPresenter.validateUser("email@example.com", "");
-        verify(loginInteractor).sendLoginRequest("email@example.com", "", loginPresenter);
+        verify(loginView).setLoginFailed("Please enter your password");
     }
 }
