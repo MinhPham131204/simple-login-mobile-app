@@ -1,4 +1,4 @@
-package com.example.application1.security;
+package com.example.application1.util.security;
 
 import android.util.Base64;
 import android.util.Log;
