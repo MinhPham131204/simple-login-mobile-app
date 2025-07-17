@@ -1,5 +1,6 @@
 package com.example.application1.util.connection;
 
+import com.example.application1.R;
 import com.example.application1.util.security.CustomTrustManager;
 
 import java.io.BufferedReader;
@@ -17,6 +18,17 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
 public class RealHttpClient implements HttpClient{
+    private static RealHttpClient instance;
+
+    private RealHttpClient() {}
+
+    public static RealHttpClient getInstance() {
+        if(instance == null) {
+            instance = new RealHttpClient();
+        }
+        return instance;
+    }
+
     private SSLSocketFactory getSSLSocketFactory() {
         try {
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());

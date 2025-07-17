@@ -21,7 +21,7 @@ public class LoginInteractor {
     public LoginInteractor() {
         handler = new Handler(Looper.getMainLooper());
         executor = Executors.newSingleThreadExecutor();
-        httpClient = new RealHttpClient();
+        httpClient = RealHttpClient.getInstance();
     }
 
     public LoginInteractor(ExecutorService executor, Handler handler, HttpClient httpClient) {
