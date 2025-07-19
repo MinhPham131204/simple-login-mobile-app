@@ -22,6 +22,7 @@ import com.example.application1.checkEmulatorFactory.checkEmulatorCreator.Finger
 import com.example.application1.checkEmulatorFactory.checkEmulatorCreator.HardwareCheckCreator;
 import com.example.application1.checkEmulatorFactory.checkEmulatorCreator.ModelCheckCreator;
 import com.example.application1.checkEmulatorFactory.checkEmulatorCreator.ProductCheckCreator;
+import com.example.application1.util.factory.ClientFactory;
 import com.example.application1.view.home.HomeActivity;
 import com.example.application1.R;
 import com.example.application1.presenter.login.LoginPresenter;
@@ -44,9 +45,8 @@ public class MainActivity extends AppCompatActivity implements LoginView{
             return insets;
         });
 
-//        CheckCreator cc = new DeviceCheckCreator();
-//        CheckEmulator ce = cc.createCheck();
-//        Log.d("DEBUG", "app run on emulator: " + ce.isEmulator());
+        // check app is running on emulator (or not)
+        ClientFactory.checkAllCreator();
 
         emailEditText = findViewById(R.id.emailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
