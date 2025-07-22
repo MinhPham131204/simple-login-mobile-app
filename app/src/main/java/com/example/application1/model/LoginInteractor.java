@@ -3,9 +3,9 @@ package com.example.application1.model;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.example.application1.presenter.login.LoginPresenter;
 import com.example.application1.util.connection.HttpClient;
 import com.example.application1.util.connection.RealHttpClient;
+import com.example.application1.util.handler.LoginResponse;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,7 +30,7 @@ public class LoginInteractor {
         this.httpClient = httpClient;
     }
 
-    public void sendLoginRequest(String email, String password, LoginPresenter presenter) {
+    public void sendLoginRequest(String email, String password, LoginResponse loginResponse) {
         executor.execute(() -> {
             try {
                 JSONObject json = new JSONObject();
@@ -45,17 +45,17 @@ public class LoginInteractor {
                 handler.post(() -> {
                     try {
                         if (loginStatus) {
-                            presenter.onLoginSuccess(resp.getString("userInfo"));
+                            loginResponse.onSuccess(resp.getString("userInfo"));
                         } else {
-                            presenter.onLoginFailed(resp.getString("message"));
+                            loginResponse.onFailure(resp.getString("message"));
                         }
                     } catch (JSONException e) {
                         // exception string: No value for userInfo (message)
-                        presenter.onLoginError(e.getMessage());
+                        loginResponse.onError(e.getMessage());
                     }
                 });
             } catch (Exception e) {
-                handler.post(() -> presenter.onLoginError(e.getMessage()));
+                handler.post(() -> loginResponse.onError(e.getMessage()));
             }
         });
     }

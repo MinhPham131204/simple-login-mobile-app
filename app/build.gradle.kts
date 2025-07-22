@@ -1,5 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
+//    id("org.jetbrains.kotlin.android") version "2.2.0"
+//    id("com.google.gms.google-services") version "4.4.3"
+//    id("org.jetbrains.kotlin.kapt") version "2.2.0"
 }
 
 android {
@@ -34,6 +37,10 @@ android {
         unitTests.isReturnDefaultValues = true
         unitTests.isIncludeAndroidResources = true
     }
+
+    buildFeatures {
+        dataBinding = true
+    }
 }
 
 dependencies {
@@ -46,5 +53,6 @@ dependencies {
     testImplementation(libs.core)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.core.testing)
     androidTestImplementation(libs.espresso.core)
 }
