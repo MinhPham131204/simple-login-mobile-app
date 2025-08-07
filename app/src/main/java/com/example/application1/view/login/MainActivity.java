@@ -8,6 +8,7 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.application1.util.factory.ClientFactory;
 import com.example.application1.view.home.HomeActivity;
 import com.example.application1.R;
 import com.example.application1.viewModel.login.LoginViewModel;
@@ -25,6 +26,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+
+        String checkDevice = ClientFactory.checkAllCreator();
+        showMessage(checkDevice);
 
         ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         viewModel = new ViewModelProvider(this).get(LoginViewModel.class);

@@ -1,22 +1,12 @@
 package com.example.application1.util.factory;
 
-import android.util.Log;
-
 import com.example.application1.checkEmulatorFactory.checkEmulator.CheckEmulator;
 import com.example.application1.checkEmulatorFactory.checkEmulatorCreator.CheckCreator;
-import com.example.application1.checkEmulatorFactory.checkEmulatorCreator.DeviceCheckCreator;
-import com.example.application1.checkEmulatorFactory.checkEmulatorCreator.FingerprintCheckCreator;
-import com.example.application1.checkEmulatorFactory.checkEmulatorCreator.HardwareCheckCreator;
 import com.example.application1.checkEmulatorFactory.checkEmulatorCreator.ModelCheckCreator;
-import com.example.application1.checkEmulatorFactory.checkEmulatorCreator.ProductCheckCreator;
 
 public enum ClientFactory {
     // List all creator here
-    DEVICE_CHECK(new DeviceCheckCreator()),
-    MODEL_CHECK(new ModelCheckCreator()),
-    HARDWARE_CHECK(new HardwareCheckCreator()),
-    PRODUCT_CHECK(new ProductCheckCreator()),
-    FINGERPRINT_CHECK(new FingerprintCheckCreator());
+    MODEL_CHECK(new ModelCheckCreator());
 
     // stores the Creator object corresponding to each check type.
     private final CheckCreator creator;
@@ -26,10 +16,16 @@ public enum ClientFactory {
         this.creator = creator;
     }
 
-    public static void checkAllCreator(){
-        for (ClientFactory type : ClientFactory.values()) {
-            CheckEmulator product = type.creator.createCheck();
-            Log.d("DEBUG", type.toString() + ": " +product.isEmulator());
+    public static String checkAllCreator(){
+        ClientFactory type = ClientFactory.values()[0];
+        CheckEmulator product = type.creator.createCheck();
+
+        if(product.isEmulator()) {
+            return "App run on emulator";
+        }
+
+        else{
+            return "App run on real device";
         }
     }
 }

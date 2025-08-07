@@ -38,20 +38,17 @@ public class LoginInteractor {
                 json.put("password", password);
                 String requestBody = json.toString();
 
-                String responseBody = httpClient.request("https://192.168.1.18/login", requestBody);
-                JSONObject resp = new JSONObject(responseBody);
-                boolean loginStatus = Boolean.parseBoolean(resp.getString("loginStatus"));
+//                String responseBody = httpClient.request("https://api.escuelajs.co/api/v1/auth/login", requestBody);
+//                JSONObject resp = new JSONObject(responseBody);
+//                boolean loginStatus = Boolean.parseBoolean(resp.getString("loginStatus"));
 
+                boolean success = httpClient.request("https://api.escuelajs.co/api/v1/auth/login", requestBody);;
                 handler.post(() -> {
-                    try {
-                        if (loginStatus) {
-                            loginResponse.onSuccess(resp.getString("userInfo"));
-                        } else {
-                            loginResponse.onFailure(resp.getString("message"));
-                        }
-                    } catch (JSONException e) {
-                        // exception string: No value for userInfo (message)
-                        loginResponse.onError(e.getMessage());
+                    if(success) {
+                        loginResponse.onSuccess("User");
+                    }
+                    else {
+                        loginResponse.onFailure("Incorrect info");
                     }
                 });
             } catch (Exception e) {

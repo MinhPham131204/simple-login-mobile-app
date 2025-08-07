@@ -72,12 +72,12 @@ public class RealHttpClient implements HttpClient{
             throw new RuntimeException("Không thể khởi tạo SSL", e);
         }
     }
-    public String request(String urlString, String jsonBody) {
+    public boolean request(String urlString, String jsonBody) {
         try {
             URL url = new URL(urlString);
             HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
 
-            conn.setSSLSocketFactory(getSSLSocketFactory());
+//            conn.setSSLSocketFactory(getSSLSocketFactory());
 
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -89,19 +89,21 @@ public class RealHttpClient implements HttpClient{
             }
 
             int responseCode = conn.getResponseCode();
-            InputStream inputStream = (responseCode >= 200 && responseCode < 300)
-                    ? conn.getInputStream()
-                    : conn.getErrorStream();
+//            InputStream inputStream = (responseCode >= 200 && responseCode < 300)
+//                    ? conn.getInputStream()
+//                    : conn.getErrorStream();
+//
+//            StringBuilder response = new StringBuilder();
+//            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+//                String line;
+//                while ((line = reader.readLine()) != null) {
+//                    response.append(line);
+//                }
+//            }
+//
+//            return response.toString();
 
-            StringBuilder response = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    response.append(line);
-                }
-            }
-
-            return response.toString();
+            return responseCode >= 200 && responseCode < 300;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

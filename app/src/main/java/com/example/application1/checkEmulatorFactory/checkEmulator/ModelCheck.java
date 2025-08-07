@@ -5,6 +5,6 @@ import android.os.Build;
 public class ModelCheck implements CheckEmulator{
     @Override
     public boolean isEmulator() {
-        return Build.MODEL.contains("sdk");
+        return Build.MODEL.contains("x86");
     }
 }
