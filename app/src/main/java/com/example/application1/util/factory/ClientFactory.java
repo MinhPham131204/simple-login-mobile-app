@@ -1,12 +1,13 @@
 package com.example.application1.util.factory;
 
 import com.example.application1.checkEmulatorFactory.checkEmulator.CheckEmulator;
+import com.example.application1.checkEmulatorFactory.checkEmulatorCreator.ABICheckCreator;
 import com.example.application1.checkEmulatorFactory.checkEmulatorCreator.CheckCreator;
 import com.example.application1.checkEmulatorFactory.checkEmulatorCreator.ModelCheckCreator;
 
 public enum ClientFactory {
     // List all creator here
-    MODEL_CHECK(new ModelCheckCreator());
+    ABI_CHECK(new ABICheckCreator());
 
     // stores the Creator object corresponding to each check type.
     private final CheckCreator creator;
